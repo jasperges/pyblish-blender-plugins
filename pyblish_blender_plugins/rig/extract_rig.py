@@ -1,8 +1,7 @@
 """Extract the valid rig(s)."""
 
-import os
+import pathlib
 import tempfile
-import shutil
 from datetime import datetime
 
 
@@ -16,15 +15,15 @@ class ExtractRig(pyblish.api.InstancePlugin):
     order = pyblish.api.ExtractorOrder
     families = ['Rig']
     hosts = ['blender']
+    optional = True
 
     def process(self, instance):
         context = instance.context
-        dirname = os.path.dirname(context.data('currentFile'))
+        dirname = pathlib.Path(context.data('currentFile')).parent
         name, family = instance.data('name'), instance.data('family')
-        date = datetime.now().strftime('%Y%m%dT%H%M%SZ')
 
-        temp_dir = tempfile.mkdtemp()
-        temp_file = os.path.join(temp_dir, '.'.join((name, 'blend')))
+        temp_dir = pathlib.Path(tempfile.mkdtemp())
+        temp_file = temp_dir / '.'.join((name, 'blend'))
 
         self.log.info('Exporting %s to %s' % (instance, temp_file))
 
@@ -33,7 +32,7 @@ class ExtractRig(pyblish.api.InstancePlugin):
         # for obj in del_objs:
         #     bpy.data.objects.remove(bpy.data.objects[obj], do_unlink=True)
 
-        bpy.ops.wm.save_as_mainfile(filepath=temp_file, copy=True)
+        # bpy.ops.wm.save_as_mainfile(filepath=str(temp_file), copy=True)
         # bpy.ops.wm.open_mainfile(filepath=context.data('currentFile'))
 
-        instance.set_data('tempFile', temp_file)
+        # instance.set_data('tempFile', str(temp_file))

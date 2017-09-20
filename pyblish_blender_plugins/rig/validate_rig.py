@@ -12,6 +12,7 @@ class ValidateRigContents(pyblish.api.InstancePlugin):
 
     order = pyblish.api.ValidatorOrder
     families = ['Rig']
+    optional = True
 
     def process(self, instance):
         self.log.warning("Not validating anything at the moment... :/")
