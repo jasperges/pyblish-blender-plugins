@@ -15,6 +15,7 @@ class IntegrateRig(pyblish.api.InstancePlugin):
     order = pyblish.api.IntegratorOrder
     families = ['Rig']
     optional = True
+    active = False
 
     def process(self, instance):
         assert instance.data('tempFile'), 'Can\'t find rig on disk, aborting...'

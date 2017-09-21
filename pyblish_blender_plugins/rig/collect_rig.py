@@ -34,6 +34,10 @@ def get_all_children(objects):
 class SaveFile(pyblish.api.Action):
     """Save the blend file"""
 
+    label = "Save File"
+    on = "failed"
+    icon = "floppy-o"
+
     def process(self, context, plugin):
         if not bpy.data.is_saved or bpy.data.is_dirty:
             bpy.ops.wm.save_mainfile()

@@ -16,6 +16,7 @@ class ExtractRig(pyblish.api.InstancePlugin):
     families = ['Rig']
     hosts = ['blender']
     optional = True
+    active = False
 
     def process(self, instance):
         context = instance.context

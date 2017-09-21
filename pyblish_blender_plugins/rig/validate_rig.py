@@ -5,7 +5,72 @@
 #     - check if an armature is parented
 
 import pyblish.api
+import bpy
 from mathutils import Matrix
+
+
+class SelectInvalidNodes(pyblish.api.Action):
+    label = "Select Broken Objects"
+    on = "failed"
+    icon = "hand-o-up"
+
+    def process(self, context, plugin):
+        nodes = []
+        for result in context.data["results"]:
+            if result['error'] and plugin == result['plugin']:
+                instance = result['instance']
+                broken = instance.data.get('broken')
+                self.log.info(broken)
+                if broken:
+                    bpy.ops.object.select_all(action='DESELECT')
+                    broken.select = True
+                    bpy.context.scene.objects.active = broken
+
+
+class GroupChildren(pyblish.api.Action):
+    """Put the children in the same group as the armature"""
+
+    label = "Put Children in Armature Group"
+    on = "failed"
+    icon = "users"
+
+    def process(self, context, plugin):
+        for result in context.data['results']:
+            if result['error'] and plugin == result['plugin']:
+                instance = result['instance']
+                armature = instance.data('armature')
+                if not armature.users_group:
+                    return
+                group = armature.users_group[0]
+                for child in instance.data('children'):
+                    try:
+                        group.objects.link(child)
+                        self.log.info("%s is now in group %s" % (child.name, group.name))
+                    except RuntimeError:
+                        pass
+
+
+class UngroupWidgets(pyblish.api.Action):
+    """Remove the widgets from the armature group"""
+
+    label = "Remove Widgets from Armature Group"
+    on = "failed"
+    icon = "times"
+
+    def process(self, context, plugin):
+        for result in context.data['results']:
+            if result['error'] and plugin == result['plugin']:
+                instance = result['instance']
+                armature = instance.data('armature')
+                if not armature.users_group:
+                    return
+                group = armature.users_group[0]
+                for widget in instance.data('widgets'):
+                    try:
+                        group.objects.unlink(widget)
+                        self.log.info("%s is removed from group %s" % (widget.name, group.name))
+                    except RuntimeError:
+                        pass
 
 
 class IsGrouped(pyblish.api.InstancePlugin):
@@ -16,12 +81,15 @@ class IsGrouped(pyblish.api.InstancePlugin):
     label = "Is Grouped"
     families = ["Rig"]
     optional = True
+    # actions = [SelectInvalidNodes]
 
     def process(self, instance):
         armature = instance.data('armature')
         if not armature.users_group:
+            # instance.set_data('broken', armature)
             raise ValueError("Armature '%s' is not grouped" % armature.name)
         if len(armature.users_group) > 1:
+            # instance.set_data('broken', armature)
             raise ValueError("Armature '%s' should be in exactly 1 group" % armature.name)
 
 
@@ -33,7 +101,7 @@ class ChildrenInGroup(pyblish.api.InstancePlugin):
     label = "Children Grouped"
     families = ["Rig"]
     optional = True
-    # TODO: add action to group children
+    actions = [GroupChildren]
 
     def process(self, instance):
         armature = instance.data('armature')
@@ -53,7 +121,7 @@ class WidgetsNotGrouped(pyblish.api.InstancePlugin):
     label = "Widgets not Grouped"
     families = ["Rig"]
     optional = True
-    # TODO: add action to remove widgets from the offending group
+    actions = [UngroupWidgets]
 
     def process(self, instance):
         armature = instance.data('armature')
