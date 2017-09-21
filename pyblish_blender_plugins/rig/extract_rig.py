@@ -28,6 +28,15 @@ class ExtractRig(pyblish.api.InstancePlugin):
 
         self.log.info('Exporting %s to %s' % (instance, temp_file))
 
+        # export_scene = bpy.data.scenes.new(name)
+        # for screen in bpy.data.screens:
+        #     screen.scene = export_scene
+        # for member in instance:
+        #     export_scene.objects.link(member)
+        # for scene in bpy.data.scenes:
+        #     if scene != export_scene:
+        #         bpy.data.scenes.remove(scene)
+        # bpy.ops.wm.revert_mainfile()
         # TODO: find a way to (resursively) remove unwanted things.
         # del_objs = [obj.name for obj in bpy.data.objects if obj not in instance]
         # for obj in del_objs:
