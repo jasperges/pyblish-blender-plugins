@@ -123,6 +123,7 @@ class IsGrouped(pyblish.api.InstancePlugin):
     label = "Is Grouped"
     families = ["Rig"]
     optional = True
+    active = False
     # actions = [SelectInvalidNodes]
 
     def process(self, instance):
@@ -144,6 +145,7 @@ class ChildrenInGroup(pyblish.api.InstancePlugin):
     families = ["Rig"]
     optional = True
     actions = [GroupChildren]
+    active = False
 
     def process(self, instance):
         armature = instance.data('armature')
@@ -164,6 +166,7 @@ class WidgetsNotGrouped(pyblish.api.InstancePlugin):
     families = ["Rig"]
     optional = True
     actions = [UngroupWidgets]
+    active = False
 
     def process(self, instance):
         armature = instance.data('armature')
@@ -184,6 +187,7 @@ class NoAnimation(pyblish.api.InstancePlugin):
     families = ["Rig"]
     optional = True
     actions = [RemoveAnimation]
+    active = False
 
     def process(self, instance):
         for member in instance:
@@ -200,6 +204,7 @@ class NoTransforms(pyblish.api.InstancePlugin):
     families = ["Rig"]
     optional = True
     actions = [ResetTransforms]
+    active = False
 
     def process(self, instance):
         armature = instance.data('armature')
