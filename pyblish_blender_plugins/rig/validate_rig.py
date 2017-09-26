@@ -5,6 +5,7 @@
 #     - check if an armature is parented
 #     - check if children or widgets have animation (add to NoAnimation)
 #     - check if all 'armature modifier' children are also parented to the armature
+#     - fix 'dirty' status of data or save after action is successfully applied
 
 import pyblish.api
 import bpy

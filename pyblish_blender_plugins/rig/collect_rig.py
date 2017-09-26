@@ -52,8 +52,8 @@ class CollectRig(pyblish.api.ContextPlugin):
 
     def process(self, context):
         # First check if the file is saved
-        if not bpy.data.is_saved or bpy.data.is_dirty:
-            raise Warning("Please save the file before publishing")
+        # if not bpy.data.is_saved or bpy.data.is_dirty:
+            # raise Warning("Please save the file before publishing")
         # try:
         #     task_id = bpy.context.scene.piecekeeper.stalker.task_id
         # except AttributeError:
