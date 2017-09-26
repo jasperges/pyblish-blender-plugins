@@ -12,6 +12,32 @@ import bpy
 from mathutils import Matrix
 
 
+class AddObjectsToGroup(bpy.types.Operator):
+    """Add the selected objects to the specified group"""
+
+    bl_description = "Add selected objects to a group"
+    bl_idname = "group.objects_add"
+    bl_label = "Add to Group"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    group = bpy.props.StringProperty(
+        name="Group",
+        description="The name of the group to add the objects to",
+        default="",
+    )
+    objects = bpy.props.StringProperty(
+        name="Objects",
+        description="A semi-colon seperated list of objects to add to the group (e.g.: 'Suzanne;Cube.001')",
+        default="",
+    )
+
+    def execute(self, context):
+        group = bpy.data.groups[self.group]
+        for obj in self.objects.split(';'):
+            group.objects.link(bpy.data.objects[obj])
+        return {'FINISHED'}
+
+
 class SelectInvalidNodes(pyblish.api.Action):
     label = "Select Broken Objects"
     on = "failed"
@@ -45,12 +71,9 @@ class GroupChildren(pyblish.api.Action):
                 if not armature.users_group:
                     return
                 group = armature.users_group[0]
-                for child in instance.data('children'):
-                    try:
-                        group.objects.link(child)
-                        self.log.info("%s is now in group %s" % (child.name, group.name))
-                    except RuntimeError:
-                        pass
+                objects = {child.name for child in instance.data('children')}
+                bpy.ops.group.objects_add(True, group=group.name, objects=";".join(objects))
+                self.log.info("%s are now in group %s" % (", ".join(objects), group.name))
 
 
 class UngroupWidgets(pyblish.api.Action):
@@ -214,3 +237,6 @@ class NoTransforms(pyblish.api.InstancePlugin):
         for pose_bone in armature.pose.bones:
             if pose_bone.matrix_basis != identity_matrix:
                 raise ValueError("%s should be in rest position (no posed bones)" % armature.name)
+
+
+bpy.utils.register_class(AddObjectsToGroup)
