@@ -26,7 +26,17 @@ class ExtractRig(pyblish.api.InstancePlugin):
         temp_dir = pathlib.Path(tempfile.mkdtemp())
         temp_file = temp_dir / '.'.join((name, 'blend'))
 
-        self.log.info('Exporting %s to %s' % (instance, temp_file))
+        if not bpy.data.is_saved or bpy.data.is_dirty:
+            self.log.info("First saving file...")
+            bpy.ops.wm.save_as_mainfile(filepath=context.data('currentFile'))
+
+        # self.log.info('Exporting %s to %s' % (instance, temp_file))
+
+        # for obj in bpy.data.objects:
+        #     if obj not in instance:
+        #         for scene in bpy.data.scenes:
+        #             scene.objects.unlink(obj)
+        #             self.log.info(obj.name)
 
         # export_scene = bpy.data.scenes.new(name)
         # for screen in bpy.data.screens:
