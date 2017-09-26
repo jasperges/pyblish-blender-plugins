@@ -1,5 +1,7 @@
 """Integrate the rig(s)."""
 
+# TODO: properly get version number for public file
+
 import pathlib
 import shutil
 import re
