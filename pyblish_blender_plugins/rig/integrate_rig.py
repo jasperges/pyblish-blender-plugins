@@ -1,6 +1,6 @@
 """Integrate the rig(s)."""
 
-# TODO: properly get version number for public file
+# TODO: properly get version number for public file + connect to Stalker?
 
 import pathlib
 import shutil
@@ -16,7 +16,7 @@ class IntegrateRig(pyblish.api.InstancePlugin):
     order = pyblish.api.IntegratorOrder
     families = ['Rig']
     optional = True
-    # active = False
+    active = False
 
     def process(self, instance):
         assert instance.data('tempFile'), 'Can\'t find rig on disk, aborting...'
@@ -29,11 +29,21 @@ class IntegrateRig(pyblish.api.InstancePlugin):
         if not root.is_dir():
             root.mkdir()
 
-        version = 'v{:02d}'.format(len(list(root.glob("*.blend"))) + 1)
+        current_file = pathlib.Path(context.data('currentFile'))
+        pattern = re.compile(r"(?P<basename>.*)(?P<version>v\d+)$")
+        match = re.match(pattern, current_file.stem)
+        if not match:
+            raise RuntimeError("Could not find a version number at the end of the file name")
+        basename = match.group('basename')
+        version_len = len(match.group('version')) - 1
+        version = len(list(root.glob("{basename}*{suffix}".format(
+            basename=basename, suffix=current_file.suffix)))) + 1
+        version_string = "v{version:0{version_len}d}".format(
+            version=version, version_len=version_len)
 
         src = instance.data('tempFile')
-        current_file = pathlib.Path(context.data('currentFile'))
-        dst_filename = version.join(re.split(r'v\d+', current_file.name))
+        dst_filename = "{basename}{version_string}{suffix}".format(
+            basename=basename, version_string=version_string, suffix=current_file.suffix)
         dst = root / dst_filename
 
         self.log.info('Copying %s to %s...' % (src, dst))
