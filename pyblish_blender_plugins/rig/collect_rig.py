@@ -71,6 +71,9 @@ class CollectRig(pyblish.api.ContextPlugin):
             self.log.info("This is not a rigging task, but %s" % task.name)
             return
 
+        self.log.info("Found rigging task for character '%s' in project '%s'..."
+                      % (task.parent.name, task.project.name))
+
         for obj in bpy.data.objects:
             if not obj.type == 'ARMATURE' or obj.name == 'metarig':
                 continue
