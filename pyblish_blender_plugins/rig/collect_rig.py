@@ -58,7 +58,7 @@ class CollectRig(pyblish.api.ContextPlugin):
         except AttributeError:
             self.log.error("Task ID could not be found in the scene")
             raise
-        if not task_id:
+        if not task_id or task_id == "-1":
             self.log.warning("The task is not set. Is this a valid production file?")
             return
         db.setup()
