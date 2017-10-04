@@ -1,8 +1,7 @@
 """Collect a rig in the open file."""
 
 import pyblish.api
-from stalker import db
-from stalker import Task
+from stalker import db, Task
 import bpy
 import logging
 
@@ -55,12 +54,12 @@ class CollectRig(pyblish.api.ContextPlugin):
         if not bpy.data.is_saved or bpy.data.is_dirty:
             raise Warning("Please save the file before publishing")
         try:
-            task_id = bpy.context.scene.piecekeeper.stalker.task_id
+            task_id = bpy.context.scene.piecekeeper.stalker.task
         except AttributeError:
             self.log.error("Task ID could not be found in the scene")
             raise
-        if task_id < 0:
-            self.log.warning("The task ID is not set. Is this a valid production file?")
+        if not task_id:
+            self.log.warning("The task is not set. Is this a valid production file?")
             return
         db.setup()
         task = Task.query.filter_by(id=task_id).first()
